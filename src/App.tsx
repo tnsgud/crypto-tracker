@@ -3,9 +3,6 @@ import Router from './router';
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
-font-family: 'Source Sans Pro', sans-serif;
-
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -26,6 +23,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline;
 }
+/* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, main, menu, nav, section {
   display: block;
@@ -57,11 +55,12 @@ table {
 }
 body {
   font-family: 'Source Sans Pro', sans-serif;
-  background-color: ${(props) => props.theme.bgColor};
-  color: ${(props) => props.theme.textColor}
+  background-color:${(props) => props.theme.bgColor};
+  color:${(props) => props.theme.textColor}
 }
 a {
-  text-decoration: none;
+  text-decoration:none;
+  color:inherit;
 }
 `;
 

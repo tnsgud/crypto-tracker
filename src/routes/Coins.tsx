@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 const Container = styled.div`
   padding: 0 20px;
+  margin: 0 auto;
+  max-width: 480px;
 `;
 const Header = styled.header`
   height: 10vh;

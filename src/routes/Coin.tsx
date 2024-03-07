@@ -10,6 +10,8 @@ import {
 import styled from 'styled-components';
 import Price from './Price';
 import Chart from './Chart';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCoinInfo, fetchTickers } from '../api';
 
 // Types
 interface RouteParams {
@@ -139,35 +141,26 @@ function Coin() {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
 
-  const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
+  const { isLoading: isInfoLoading, data: info } = useQuery<InfoData>(
+    ['info', coinId],
+    () => fetchCoinInfo(coinId)
+  );
+  const { isLoading: isPriceLoading, data: priceInfo } = useQuery<PriceData>(
+    ['tickers', coinId],
+    () => fetchTickers(coinId)
+  );
   const chartMatch = useRouteMatch('/:coinId/chart');
   const priceMatch = useRouteMatch('/:coinId/price');
-
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, []);
+  const loading = isInfoLoading || isPriceLoading;
 
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? 'Loading...' : info?.name}
+          {state?.name ? state.name : isInfoLoading ? 'Loading...' : info?.name}
         </Title>
       </Header>
-      {loading ? (
+      {isInfoLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
@@ -189,11 +182,15 @@ function Coin() {
           <Overview>
             <OverviewItem>
               <span>Total Suply:</span>
-              <span>{priceInfo?.total_supply}</span>
+              <span>
+                {isPriceLoading ? 'Loading...' : priceInfo?.total_supply}
+              </span>
             </OverviewItem>
             <OverviewItem>
               <span>Max Supply:</span>
-              <span>{priceInfo?.max_supply}</span>
+              <span>
+                {isPriceLoading ? 'Loading...' : priceInfo?.max_supply}
+              </span>
             </OverviewItem>
           </Overview>
           <Tabs>

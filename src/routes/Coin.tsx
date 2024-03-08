@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   useLocation,
   useParams,
@@ -7,6 +6,7 @@ import {
   Link,
   useRouteMatch,
 } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import Price from './Price';
 import Chart from './Chart';
@@ -147,14 +147,21 @@ function Coin() {
   );
   const { isLoading: isPriceLoading, data: priceInfo } = useQuery<PriceData>(
     ['tickers', coinId],
-    () => fetchTickers(coinId)
+    () => fetchTickers(coinId),
+    {
+      refetchInterval: 5000,
+    }
   );
   const chartMatch = useRouteMatch('/:coinId/chart');
   const priceMatch = useRouteMatch('/:coinId/price');
-  const loading = isInfoLoading || isPriceLoading;
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : isInfoLoading ? 'Loading...' : info?.name}
+        </title>
+      </Helmet>
       <Header>
         <Title>
           {state?.name ? state.name : isInfoLoading ? 'Loading...' : info?.name}
@@ -174,8 +181,8 @@ function Coin() {
               <span>${info?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{info?.open_source ? 'Yes' : 'No'}</span>
+              <span>Price:</span>
+              <span>${priceInfo?.quotes.USD.price}</span>
             </OverviewItem>
           </Overview>
           <Description>{info?.description}</Description>
@@ -195,10 +202,10 @@ function Coin() {
           </Overview>
           <Tabs>
             <Tab isActive={chartMatch !== null}>
-              <Link to={`/:coinId/chart`}>Chart</Link>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
             </Tab>
             <Tab isActive={priceMatch !== null}>
-              <Link to={`/:coinId/price`}>Price</Link>
+              <Link to={`/${coinId}/price`}>Price</Link>
             </Tab>
           </Tabs>
 
@@ -207,7 +214,7 @@ function Coin() {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart />
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
